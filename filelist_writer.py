@@ -1,10 +1,11 @@
 import copy
+from tqdm import tqdm
 
-def write_updated_reaper_filelist(paths, original_reaper_data, output_path):
+def write_reaper_filelist(paths, original_reaper_data, output_path):
     reaper_filelist_content = "\n".join(paths)
     reaper_data = copy.deepcopy(original_reaper_data)
 
-    for file_path, file_data in reaper_data.items():
+    for file_path, file_data in tqdm(reaper_data.items()):
         reaper_filelist_content += f'FILE "{file_path}" {file_data["position_info"]}'
         del file_data["file_path"]
         del file_data["position_info"]

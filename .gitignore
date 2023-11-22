@@ -1,3 +1,4 @@
 output.ReaperFileList
 tab2mediadb.py
 __pycache__/*
+*.json
