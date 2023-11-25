@@ -1,9 +1,29 @@
 import copy
 from tqdm import tqdm
 
+
+def fix_all_irregular_items(reaper_files):
+    file_list = reaper_files
+    for outer_key, inner_dict in file_list.items():
+        uppercase_keys = [key for key in inner_dict.keys() if any(c.isupper() for c in key)]
+        if uppercase_keys:
+            original_desc = ''
+            try:
+                original_desc = inner_dict['metadata']['D']
+            except KeyError:
+                inner_dict['metadata']['D'] = ''
+            irregular_keys = [key.replace('"', "'").strip(':') for key in uppercase_keys]
+            new_desc = original_desc + ' '.join(irregular_keys)
+            inner_dict['metadata']['D'] = new_desc
+            for key in uppercase_keys:
+                del inner_dict[key]
+            file_list[outer_key] = inner_dict
+
+
 def write_reaper_filelist(paths, original_reaper_data, output_path):
     reaper_filelist_content = "\n".join(paths)
     reaper_data = copy.deepcopy(original_reaper_data)
+    fix_all_irregular_items(reaper_data)
 
     for file_path, file_data in tqdm(reaper_data.items()):
         reaper_filelist_content += f'FILE "{file_path}" {file_data["position_info"]}'
@@ -35,6 +55,5 @@ def write_reaper_filelist(paths, original_reaper_data, output_path):
             basic_info_2 = 'DATA ' + ' '.join(basic_info_list_2)
             reaper_filelist_content += basic_info_2 + '\n'
 
-    with open(output_path, 'w', encoding= 'utf8') as output_file:
+    with open(output_path, 'w', encoding='utf8') as output_file:
         output_file.write(reaper_filelist_content)
-

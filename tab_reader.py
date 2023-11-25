@@ -1,20 +1,22 @@
 import re
 
+
 def read_tab_file(tab_file_path):
     tab_data = {}
-    def is_different_part(file_id : str) -> bool:
+
+    def is_different_part(file_id: str) -> bool:
         return get_last_id() == file_id
-    
-    def update_desc(new_desc : str) -> str:
+
+    def update_desc(new_desc: str) -> str:
         last_id = get_last_id()
         old_desc = tab_data[last_id]["desc"]
         return merge_strings(old_desc, new_desc)
-    
+
     def get_last_id():
         last_id = list(tab_data.keys())[-1] if tab_data else None
         return last_id
-    
-    with open(tab_file_path, 'r', encoding= 'utf8') as tab_file:
+
+    with open(tab_file_path, 'r', encoding='utf8') as tab_file:
         for line in tab_file:
             wav_metadata = {}
             splited_line = line.strip().split('\t')
@@ -29,9 +31,16 @@ def read_tab_file(tab_file_path):
                 if is_different_part(file_id):
                     tab_data[get_last_id()]["desc"] = update_desc(title_and_desc.group(2))
                     continue
-            
+            else:
+                wav_metadata["desc"] = splited_line[3]
+                wav_metadata["title"] = ""
+                if is_different_part(file_id):
+                    tab_data[get_last_id()]["desc"] = update_desc(splited_line[3])
+                    continue
+
             tab_data[file_id] = wav_metadata
     return tab_data
+
 
 def merge_strings(str1, str2):
     common_prefix = ""
@@ -60,4 +69,3 @@ def merge_strings(str1, str2):
     merged_string = f"{common_prefix}{str1},{str2}{common_suffix}"
 
     return merged_string
-
