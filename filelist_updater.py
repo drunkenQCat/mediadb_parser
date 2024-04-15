@@ -33,6 +33,7 @@ def update_reaper_filelist(reaper_data: dict, tab_data: dict):
     #         filtered_elements[key] = value
 
     count = 0
+    file_id_list = []
     first_path = next(iter(filtered_elements))
     first_id = extract_serial_number(first_path)
     first_id_in_tab = next(iter(tab_data))
@@ -44,8 +45,17 @@ def update_reaper_filelist(reaper_data: dict, tab_data: dict):
             data['metadata']['D'] = tab_data[file_id]['desc']
             count += 1
         reaper_data[path] = data
+        file_id_list += file_id
     print(f'the first fileid is {first_id}')
     print(f'the first id in tab is {first_id_in_tab}')
     print(f'the first file path is {first_path}')
     print(f'{count} items has been written.')
+    # 检查tab_data中有但file_id_list中没有的元素，并写入日志文件
+    with open('missing_file_log.txt', 'w') as f:
+        for file_id, tab_info in tab_data.items():
+            if file_id not in file_id_list:
+                f.write(f"File ID: {file_id} \n")
+                f.write(f"Title: {tab_info[file_id]['title']}\n")
+                f.write(f"Description: {tab_info[file_id]['desc']}\n\n")
+
 

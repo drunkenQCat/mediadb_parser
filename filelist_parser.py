@@ -5,6 +5,7 @@ import json
 import pickle
 import default_data
 from time import time
+from pathlib import Path
 
 
 def calculate_hash(file_path):
@@ -160,7 +161,27 @@ def read_reaper_filelist(reaper_filelist_path):
         reaper_data[current_file['file_path']] = current_file
     return paths, reaper_data
 
+def convert_to_lib_path_structure(reaper_data):
+    two_level_structure = {}
+
+    for file_path, file_info in reaper_data.items():
+        sound_lib = file_info.get('sound_lib', 'Unknown')
+        if sound_lib not in two_level_structure:
+            two_level_structure[sound_lib] = {}
+            path = Path(file_path)
+            two_level_structure[sound_lib]['parent'] = str(path.parent.parent)
+            two_level_structure[sound_lib]['tab'] = ''
+
+        two_level_structure[sound_lib][file_path] = file_info
+
+    return two_level_structure
+
 
 def parse_soundlib(wav_path: str):
     splited = wav_path.split('\\')
     return splited[-3]
+
+def list_all_tabs(path = r'C:\Users\Administrator\Documents\Injector\TABS'):
+    p = Path(path)
+    tabs = p.glob('*.tab')
+    return [str(t) for t in tabs]

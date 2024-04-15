@@ -1,4 +1,5 @@
 lib_keyword = "6000 Extension III"
+lib_folder_keyword = "6000 Extension III"
 tab_path = (r"C:\Users\Administrator\Documents\Injector\TABS\Sound Ideas Series 6000 Extension III Sound Effects "
             r"Library.tab")
 reaper_filelist = r"C:/Users/Administrator/AppData/Roaming/REAPER/MediaDB/0b.ReaperFileList"

@@ -41,31 +41,47 @@ def read_tab_file(tab_file_path):
             tab_data[file_id] = wav_metadata
     return tab_data
 
-
 def merge_strings(str1, str2):
-    common_prefix = ""
-    common_suffix = ""
+    # 查找共同前缀
+    prefix_length = 0
+    while (prefix_length < len(str1) and prefix_length < len(str2) and
+           str1[prefix_length] == str2[prefix_length]):
+        prefix_length += 1
+    prefix = str1[:prefix_length]
 
-    # 找到共同的前缀
-    min_len = min(len(str1), len(str2))
-    for i in range(min_len):
-        if str1[i] == str2[i]:
-            common_prefix += str1[i]
-        else:
-            break
+    # 查找共同后缀
+    suffix_length = 0
+    while (suffix_length < len(str1) - prefix_length and suffix_length < len(str2) - prefix_length and
+           str1[-1 - suffix_length] == str2[-1 - suffix_length]):
+        suffix_length += 1
+    suffix = str1[-suffix_length:] if suffix_length > 0 else ""
 
-    # 找到共同的后缀
-    for i in range(1, min_len + 1):
-        if str1[-i] == str2[-i]:
-            common_suffix = str1[-i] + common_suffix
-        else:
-            break
+    # 提取没有公共前缀和后缀的部分
+    unique_part1 = str1[prefix_length:-suffix_length].strip() if suffix_length > 0 else str1[prefix_length:].strip()
+    unique_part2 = str2[prefix_length:-suffix_length].strip() if suffix_length > 0 else str2[prefix_length:].strip()
 
-    # 去除共同的前缀和后缀
-    str1 = str1[len(common_prefix):-len(common_suffix)] if common_suffix else str1[len(common_prefix):]
-    str2 = str2[len(common_prefix):-len(common_suffix)] if common_suffix else str2[len(common_prefix):]
+    # 构建结果字符串
+    if unique_part1 and unique_part2:
+        return f"{prefix}{unique_part1}, {unique_part2}{suffix}"
+    elif unique_part1:
+        return f"{prefix}{unique_part1}{suffix}"
+    else:
+        return f"{prefix}{unique_part2}{suffix}"
 
-    # 合并字符串，使用逗号分隔
-    merged_string = f"{common_prefix}{str1},{str2}{common_suffix}"
+def merge_string_list(string_list):
+    if not string_list:
+        return ""
+    
+    result = string_list[0]
+    for next_string in string_list[1:]:
+        result = merge_strings(result, next_string)
+    
+    # 移除最后的逗号（如果存在）并且处理空格
+    result = result.rstrip(',').strip()
+    return result
 
-    return merged_string
+# 测试用例
+string_list1 = ["hello world comp", "hello universe comp", "hello world G comp"]
+string_list2 = ["hello world", "hello universe", "hello world"]
+print("Merged result 1:", merge_string_list(string_list1))
+print("Merged result 2:", merge_string_list(string_list2))

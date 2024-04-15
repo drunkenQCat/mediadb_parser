@@ -3,7 +3,7 @@ import tkinter as tk
 from tkinter import filedialog
 import default_data
 from tab_reader import read_tab_file
-from filelist_parser import parse_reaper_filelist
+from filelist_parser import convert_to_lib_path_structure, parse_reaper_filelist
 from filelist_parser import save_to_json
 from filelist_parser import save_to_pickle
 from filelist_updater import update_reaper_filelist
@@ -25,10 +25,14 @@ class MyApp:
 
         # 初始化参数
         self.lib_keyword_str = tk.StringVar(value=default_data.lib_keyword)
+        self.lib_folder_keyword_str = tk.StringVar(value=default_data.lib_folder_keyword)
         self.tab_file_path_str = tk.StringVar(value=default_data.tab_path)
         self.tab_data = read_tab_file(self.tab_file_path_str.get())
         self.filelist_path_str = tk.StringVar(value=default_data.reaper_filelist)
+
         self.paths, self.list_data = parse_reaper_filelist(self.filelist_path_str.get())
+        self.list_data_library_to_file = convert_to_lib_path_structure(self.list_data)
+
         self.output_path_str = tk.StringVar(value=default_data.output_path)
         # self.id_regex_str = tk.StringVar(value=default_data.extract_pattern)
         # 新增参数
@@ -43,6 +47,11 @@ class MyApp:
     def update_lib_keyword(self, *args):
         # 这个函数会在 StringVar 的值变化时调用
         default_data.lib_keyword = self.lib_keyword_str.get()
+        print(default_data.lib_keyword)
+
+    def update_lib_folder_keyword(self, *args):
+        # 这个函数会在 StringVar 的值变化时调用
+        default_data.lib_folder_keyword = self.lib_folder_keyword_str.get()
         print(default_data.lib_keyword)
 
     def update_tab_path(self, *args):
