@@ -161,6 +161,7 @@ def read_reaper_filelist(reaper_filelist_path):
         reaper_data[current_file['file_path']] = current_file
     return paths, reaper_data
 
+
 def convert_to_lib_path_structure(reaper_data):
     two_level_structure = {}
 
@@ -181,7 +182,8 @@ def parse_soundlib(wav_path: str):
     splited = wav_path.split('\\')
     return splited[-3]
 
-def list_all_tabs(path = r'C:\Users\Administrator\Documents\Injector\TABS'):
+
+def list_all_tabs(path=r'C:\Users\Administrator\Documents\Injector\TABS'):
     p = Path(path)
     tabs = p.glob('*.tab')
     return [str(t) for t in tabs]

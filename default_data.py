@@ -1,8 +1,8 @@
-lib_keyword = "6000 Extension III"
-lib_folder_keyword = "6000 Extension III"
-tab_path = (r"C:\Users\Administrator\Documents\Injector\TABS\Sound Ideas Series 6000 Extension III Sound Effects "
-            r"Library.tab")
-reaper_filelist = r"C:/Users/Administrator/AppData/Roaming/REAPER/MediaDB/0b.ReaperFileList"
+lib_keyword = "6000"
+lib_folder_keyword = "6000"
+tab_path = (r"C:\Users\Administrator\Documents\Injector\TABS\Sound Ideas Series 6000 "
+            r"'The General' Sound Effects Library.tab")
+reaper_filelist = r"C:\TechnicalProjects\About_Python\mediadb_parser\6000.ReaperFileList"
 output_path = r"C:/TechnicalProjects/About_Python/mediadb_parser/output.ReaperFileList"
 extract_pattern = r"""
 pattern = r'.*\\cd(\d+)\\Track\s*(\d+).*\.(WAV|wav|Wav)'
@@ -16,8 +16,8 @@ if match:
 json_path = ''
 pickle_path = 'pickle_test.pickle'
 
-cd_prefix = 'CD '
-cd_regex = r'\d{4}'
-track_prefix = ''
+cd_prefix = 'cd'
+cd_regex = r'\d{2}'
+track_prefix = r'Track\s?'
 track_regex = r'\d+'
-id_prefix = ''
+id_prefix = '60'

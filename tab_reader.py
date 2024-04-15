@@ -22,7 +22,7 @@ def read_tab_file(tab_file_path):
             splited_line = line.strip().split('\t')
             wav_metadata["cd"] = splited_line[0]
             wav_metadata["track"] = splited_line[1].zfill(2)
-            pattern_to_separate_title_and_desc = r'(.*?)\s{2,}(.*)'
+            pattern_to_separate_title_and_desc = r'(.*?)\s{3,}(.*)'
             file_id = f"{splited_line[0]}-{splited_line[1].zfill(2)}"
             title_and_desc = re.match(pattern_to_separate_title_and_desc, splited_line[3])
             if title_and_desc is not None:

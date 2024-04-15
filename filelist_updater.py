@@ -40,13 +40,13 @@ def update_reaper_filelist(reaper_data: dict, tab_data: dict):
     for path, data in filtered_elements.items():
         file_id = extract_serial_number(path)
         if file_id in tab_data:
-            data['metadata']['A'] = default_data.lib_keyword
+            data['metadata']['B'] = default_data.lib_keyword
             data['metadata']['T'] = tab_data[file_id]['title']
             data['metadata']['D'] = tab_data[file_id]['desc']
             count += 1
         reaper_data[path] = data
-        file_id_list += file_id
-    print(f'the first fileid is {first_id}')
+        file_id_list.append(file_id)
+    print(f'the first flied is {first_id}')
     print(f'the first id in tab is {first_id_in_tab}')
     print(f'the first file path is {first_path}')
     print(f'{count} items has been written.')
@@ -54,8 +54,5 @@ def update_reaper_filelist(reaper_data: dict, tab_data: dict):
     with open('missing_file_log.txt', 'w') as f:
         for file_id, tab_info in tab_data.items():
             if file_id not in file_id_list:
+                print(f"Missing File ID: {file_id} \n")
                 f.write(f"File ID: {file_id} \n")
-                f.write(f"Title: {tab_info[file_id]['title']}\n")
-                f.write(f"Description: {tab_info[file_id]['desc']}\n\n")
-
-
