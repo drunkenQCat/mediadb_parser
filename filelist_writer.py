@@ -1,4 +1,5 @@
 import copy
+import shutil
 from tqdm import tqdm
 
 
@@ -57,3 +58,9 @@ def write_reaper_filelist(paths, original_reaper_data, output_path):
 
     with open(output_path, 'w', encoding='utf8') as output_file:
         output_file.write(reaper_filelist_content)
+
+
+def overwrite_file_list(output_path, original_path):
+    # 备份一份
+    shutil.copyfile(original_path, original_path + ".bak")
+    shutil.copyfile(output_path, original_path)

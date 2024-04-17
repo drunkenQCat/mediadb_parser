@@ -1,5 +1,5 @@
 lib_keyword = "6000"
-lib_folder_keyword = "6000"
+album = "6000"
 tab_path = (r"C:\Users\Administrator\Documents\Injector\TABS\Sound Ideas Series 6000 "
             r"'The General' Sound Effects Library.tab")
 reaper_filelist = r"C:\TechnicalProjects\About_Python\mediadb_parser\6000.ReaperFileList"

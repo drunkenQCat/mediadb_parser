@@ -33,13 +33,9 @@ def parse_reaper_filelist(reaper_filelist_path):
 
     # 生成对应的 PyTables 文件路径
     json_path = f"{hash_value}.json"
-    pickle_path = f"{hash_value}.pickle"
     default_data.json_path = json_path
-    default_data.pickle_path = pickle_path
 
-    if os.path.exists(pickle_path):
-        return read_updated_reaper_filelist_from_pickle(pickle_path)
-    elif os.path.exists(json_path):
+    if os.path.exists(json_path):
         # 如果 PyTables 文件已存在，直接读取
         return read_updated_reaper_filelist(json_path)
     else:
@@ -88,26 +84,6 @@ def save_to_pickle(pickle_path, paths, reaper_data):
     }
     with open(pickle_path, 'wb') as pickle_file:
         pickle.dump(data, pickle_file)
-
-
-def read_updated_reaper_filelist_from_pickle(pickle_path):
-    """
-    从 pickle 文件中读取 paths 和 reaper_data
-
-    Parameters:
-    - pickle_path: pickle 文件路径
-
-    Returns:
-    - paths: 文件路径列表
-    - reaper_data: Reaper 数据字典
-    """
-    with open(pickle_path, 'rb') as pickle_file:
-        data = pickle.load(pickle_file)
-
-    paths = data.get('paths', [])
-    reaper_data = data.get('reaper_data', {})
-
-    return paths, reaper_data
 
 
 def read_reaper_filelist(reaper_filelist_path):
@@ -182,8 +158,7 @@ def parse_soundlib(wav_path: str):
     splited = wav_path.split('\\')
     return splited[-3]
 
-
-def list_all_tabs(path=r'C:\Users\Administrator\Documents\Injector\TABS'):
+def list_all_tabs(path = r'C:\Users\Administrator\Documents\Injector\TABS'):
     p = Path(path)
     tabs = p.glob('*.tab')
     return [str(t) for t in tabs]

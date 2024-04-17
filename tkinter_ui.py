@@ -1,13 +1,12 @@
-import json
 import tkinter as tk
 from tkinter import filedialog
+from tkinter import messagebox
 import default_data
 from tab_reader import read_tab_file
 from filelist_parser import convert_to_lib_path_structure, parse_reaper_filelist
 from filelist_parser import save_to_json
-from filelist_parser import save_to_pickle
 from filelist_updater import update_reaper_filelist
-from filelist_writer import write_reaper_filelist
+from filelist_writer import write_reaper_filelist, overwrite_file_list
 
 
 def get_path_pattern():
@@ -18,6 +17,22 @@ def get_path_pattern():
     return pattern
 
 
+def display_head_and_tail(file_path):
+    file_head_tail = "Head 10 lines\n"
+    with open(file_path, "r") as file:
+        for _ in range(10):
+            line = file.readline()
+            if not line:
+                break  # 如果文件已经读取完毕，则跳出循环
+            file_head_tail += line.strip() + '\n'  # 使用strip()方法去除行尾的换行符
+        file_head_tail += "Tail 10 lines\n"
+        lines_rest = file.readlines()
+        last_10_lines = lines_rest[-10:]
+        for line in last_10_lines:
+            file_head_tail += line.strip() + '\n'  # 使用strip()方法去除行尾的换行符
+    messagebox.showinfo(f"Write Done", f"File head and tail:\n{file_head_tail}")
+
+
 class MyApp:
     def __init__(self, root):
         self.root = root
@@ -25,7 +40,7 @@ class MyApp:
 
         # 初始化参数
         self.lib_keyword_str = tk.StringVar(value=default_data.lib_keyword)
-        self.lib_folder_keyword_str = tk.StringVar(value=default_data.lib_folder_keyword)
+        self.album_str = tk.StringVar(value=default_data.album)
         self.tab_file_path_str = tk.StringVar(value=default_data.tab_path)
         self.tab_data = read_tab_file(self.tab_file_path_str.get())
         self.filelist_path_str = tk.StringVar(value=default_data.reaper_filelist)
@@ -44,15 +59,16 @@ class MyApp:
         # 创建界面元素
         self.create_widgets()
 
-    def update_lib_keyword(self, *args):
+    def update_lib_keyword(self):
         # 这个函数会在 StringVar 的值变化时调用
         default_data.lib_keyword = self.lib_keyword_str.get()
+        self.album_str.set(default_data.lib_keyword)
         print(default_data.lib_keyword)
 
-    def update_lib_folder_keyword(self, *args):
+    def update_album(self, *args):
         # 这个函数会在 StringVar 的值变化时调用
-        default_data.lib_folder_keyword = self.lib_folder_keyword_str.get()
-        print(default_data.lib_keyword)
+        default_data.album = self.album_str.get()
+        print(default_data.album)
 
     def update_tab_path(self, *args):
         # 这个函数会在 StringVar 的值变化时调用
@@ -89,7 +105,7 @@ class MyApp:
 
     def update_id_prefix(self, *args):
         default_data.id_prefix = self.id_prefix_str.get()
-        print(f'{default_data.id_prefix}0001-01')
+        print(f'{default_data.id_prefix}01-01')
 
     def create_widgets(self):
         # 标签和输入框
@@ -119,10 +135,10 @@ class MyApp:
         update_button.grid(row=6, column=0, columnspan=1)
         write_button = tk.Button(self.root, text="Write", command=self.write_filelist)
         write_button.grid(row=6, column=1, columnspan=1)
-        json_button = tk.Button(self.root, text="Write Json", command=self.write_json)
+        json_button = tk.Button(self.root, text="Save Json", command=self.write_json)
         json_button.grid(row=6, column=2, columnspan=1)
-        pickle_button = tk.Button(self.root, text="Write Pickle", command=self.write_pickle)
-        pickle_button.grid(row=6, column=3)
+        refresh_button = tk.Button(self.root, text="Refresh Data", command=self.refresh_data)
+        refresh_button.grid(row=6, column=3)
 
         # 新增文本框和标签
         tk.Label(self.root, text="CD Prefix:").grid(row=7, column=0, sticky="w")
@@ -145,17 +161,28 @@ class MyApp:
         self.id_prefix_str.trace_add("write", self.update_id_prefix)
         tk.Entry(self.root, textvariable=self.id_prefix_str).grid(row=11, column=1, columnspan=2, sticky="w")
 
+        tk.Label(self.root, text="Album").grid(row=12, column=0, sticky="w")
+        self.album_str.trace_add("write", self.update_album)
+        tk.Entry(self.root, textvariable=self.album_str).grid(row=12, column=1, columnspan=2, sticky="w")
+
+        # 创建一个居中的按钮
+        overwrite_button = tk.Button(self.root, text="OverWrite Original", command=self.overwrite_filelist)
+        overwrite_button.grid(row=13, sticky="nsew", columnspan=4)
+
     def browse_tab_file(self):
         file_path = filedialog.askopenfilename(filetypes=[("Tab Files", "*.tab")])
         if file_path:
             self.tab_file_path_str.set(file_path)
             self.tab_data = read_tab_file(self.tab_file_path_str.get())
+            display_head_and_tail(file_path)
 
     def browse_reaper_filelist(self):
         file_path = filedialog.askopenfilename(filetypes=[('Reaper Filelist Files', "*.ReaperFileList")])
         if file_path:
             self.filelist_path_str.set(file_path)
             self.paths, self.list_data = parse_reaper_filelist(self.filelist_path_str.get())
+            display_head_and_tail(file_path)
+            save_to_json(default_data.json_path, self.paths, self.list_data)
 
     def browse_output_path(self):
         file_path = filedialog.asksaveasfilename(defaultextension=".ReaperFileList",
@@ -164,14 +191,31 @@ class MyApp:
             self.output_path_str.set(file_path)
 
     def update_filelist(self):
-        update_reaper_filelist(self.list_data, self.tab_data)
+        message = update_reaper_filelist(self.list_data, self.tab_data)
+        messagebox.showinfo("FileList Updated", message)
 
     def write_json(self):
         save_to_json(default_data.json_path, self.paths, self.list_data)
 
-    def write_pickle(self):
-        save_to_pickle(default_data.pickle_path, self.paths, self.list_data)
+    def refresh_data(self):
+        file_path = self.filelist_path_str.get()
+        self.paths, self.list_data = parse_reaper_filelist(file_path)
+        display_head_and_tail(file_path)
 
     def write_filelist(self):
         write_reaper_filelist(self.paths, self.list_data, self.output_path_str.get())
+        # 预览前100行结果
+        file_path = self.output_path_str.get()
+        hundred_lines = ""
+
+        with open(file_path, "r") as file:
+            for _ in range(100):
+                line = file.readline()
+                if not line:
+                    break  # 如果文件已经读取完毕，则跳出循环
+                hundred_lines += line.strip() + '\n'  # 使用strip()方法去除行尾的换行符
+        messagebox.showinfo(f"Write Done", f"First Hundred Lines:\n{hundred_lines}")
+
+    def overwrite_filelist(self):
+        overwrite_file_list(self.output_path_str.get(), self.filelist_path_str.get())
 
