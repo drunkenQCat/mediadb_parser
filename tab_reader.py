@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import re
 
 
@@ -33,14 +34,15 @@ def read_tab_file(tab_file_path):
                     tab_data[get_last_id()]["desc"] = update_desc(title_and_desc.group(2))
                     continue
             else:
-                wav_metadata["desc"] = splited_line[3]
+                wav_metadata["desc"] = title_desc_combined
                 wav_metadata["title"] = ""
                 if is_different_part(file_id):
-                    tab_data[get_last_id()]["desc"] = update_desc(splited_line[3])
+                    tab_data[get_last_id()]["desc"] = update_desc(title_desc_combined)
                     continue
 
             tab_data[file_id] = wav_metadata
     return tab_data
+
 
 def merge_strings(str1, str2):
     # 查找共同前缀
@@ -68,6 +70,7 @@ def merge_strings(str1, str2):
         return f"{prefix}{unique_part1}{suffix}"
     else:
         return f"{prefix}{unique_part2}{suffix}"
+
 
 def merge_string_list(string_list):
     if not string_list:

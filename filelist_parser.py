@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import shlex
 import hashlib
 import os
@@ -69,23 +70,6 @@ def read_updated_reaper_filelist(json_path):
     return paths, reaper_data
 
 
-def save_to_pickle(pickle_path, paths, reaper_data):
-    """
-    将 paths 和 reaper_data 写入 pickle 文件
-
-    Parameters:
-    - pickle_path: 要保存到的 pickle 文件路径
-    - paths: 文件路径列表
-    - reaper_data: Reaper 数据字典
-    """
-    data = {
-        'paths': paths,
-        'reaper_data': reaper_data
-    }
-    with open(pickle_path, 'wb') as pickle_file:
-        pickle.dump(data, pickle_file)
-
-
 def read_reaper_filelist(reaper_filelist_path):
     reaper_data = {}
     paths = []
@@ -112,7 +96,12 @@ def read_reaper_filelist(reaper_filelist_path):
                 splited = attr_str.split(':')
                 key = splited[0]
                 value = ':'.join(splited[1:])
-                if current_file:
+                if current_file is None:
+                    return
+
+                if key[0].isupper():
+                    current_file['metadata'][key] = value
+                else:
                     current_file[key] = value
 
             def parse_metadata(attr_str: str):

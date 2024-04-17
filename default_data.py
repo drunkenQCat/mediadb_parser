@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 lib_keyword = "6000"
 album = "6000"
 tab_path = (r"C:\Users\Administrator\Documents\Injector\TABS\Sound Ideas Series 6000 "

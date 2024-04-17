@@ -1,9 +1,10 @@
+# -*- coding: utf-8 -*-
 import tkinter as tk
 from tkinter import filedialog
 from tkinter import messagebox
 import default_data
 from tab_reader import read_tab_file
-from filelist_parser import convert_to_lib_path_structure, parse_reaper_filelist
+from filelist_parser import convert_to_lib_path_structure, parse_reaper_filelist, read_reaper_filelist
 from filelist_parser import save_to_json
 from filelist_updater import update_reaper_filelist
 from filelist_writer import write_reaper_filelist, overwrite_file_list
@@ -19,7 +20,7 @@ def get_path_pattern():
 
 def display_head_and_tail(file_path):
     file_head_tail = "Head 10 lines\n"
-    with open(file_path, "r") as file:
+    with open(file_path, "r", encoding='utf-8') as file:
         for _ in range(10):
             line = file.readline()
             if not line:
@@ -59,10 +60,11 @@ class MyApp:
         # 创建界面元素
         self.create_widgets()
 
-    def update_lib_keyword(self):
+    def update_lib_keyword(self, *args):
         # 这个函数会在 StringVar 的值变化时调用
         default_data.lib_keyword = self.lib_keyword_str.get()
         self.album_str.set(default_data.lib_keyword)
+        default_data.album = default_data.lib_keyword
         print(default_data.lib_keyword)
 
     def update_album(self, *args):
@@ -192,6 +194,7 @@ class MyApp:
 
     def update_filelist(self):
         message = update_reaper_filelist(self.list_data, self.tab_data)
+        self.write_json()
         messagebox.showinfo("FileList Updated", message)
 
     def write_json(self):
@@ -199,7 +202,8 @@ class MyApp:
 
     def refresh_data(self):
         file_path = self.filelist_path_str.get()
-        self.paths, self.list_data = parse_reaper_filelist(file_path)
+        self.paths, self.list_data = read_reaper_filelist(file_path)
+        self.write_json()
         display_head_and_tail(file_path)
 
     def write_filelist(self):
@@ -208,7 +212,7 @@ class MyApp:
         file_path = self.output_path_str.get()
         hundred_lines = ""
 
-        with open(file_path, "r") as file:
+        with open(file_path, "r", encoding='utf-8') as file:
             for _ in range(100):
                 line = file.readline()
                 if not line:
