@@ -1,19 +1,33 @@
 # -*- coding: utf-8 -*-
-import default_data
 import re
+from enum import Enum
+
+import default_data
+
+
+class MatchCondition(Enum):
+    NO_MATCH = 0
+    TRACK_NUMBER_ONLY = 1
+    CD_AND_TRACK_NUMBER = 2
 
 
 def extract_serial_number(file_path):
-    # 示例用法
-    # file_path = 'the parent path\\6000 Extension III\\CD 6071\\29.wav'
-    # result = extract_serial_number(file_path) -------6071-29
-    cd_pattern = r'.*\\' + f'{default_data.cd_prefix}({default_data.cd_regex})'
-    track_pattern = r'.*\\' + f'{default_data.track_prefix}({default_data.track_regex})'
-    ending_pattern = r'.*\.(WAV|wav|Wav|mp3)'
-    pattern = cd_pattern + track_pattern + ending_pattern
+    pattern = default_data.full_regex
     match = re.match(pattern, file_path)
     file_id = ''
-    if match:
+    matched_condition = MatchCondition.NO_MATCH
+
+    if not match:
+        matched_condition = MatchCondition.NO_MATCH
+    if len(match.groups()) == 1:
+        matched_condition = MatchCondition.TRACK_NUMBER_ONLY
+    if len(match.groups()) == 2:
+        matched_condition = MatchCondition.CD_AND_TRACK_NUMBER
+
+    if matched_condition == MatchCondition.TRACK_NUMBER_ONLY:
+        track_number = match.group(1)
+        file_id = f'{default_data.id_prefix}-{track_number.zfill(2)}'
+    if matched_condition == MatchCondition.CD_AND_TRACK_NUMBER:
         cd_number = match.group(1)
         track_number = match.group(2)
         file_id = f'{default_data.id_prefix}{cd_number.zfill(2)}-{track_number.zfill(2)}'

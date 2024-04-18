@@ -11,6 +11,9 @@ from filelist_writer import write_reaper_filelist, overwrite_file_list
 
 
 def get_path_pattern():
+    # 示例用法
+    # file_path = 'the parent path\\6000 Extension III\\CD 6071\\29.wav'
+    # result = extract_serial_number(file_path) -------6071-29
     cd_pattern = r'.*\\' + f'{default_data.cd_prefix}({default_data.cd_regex})'
     track_pattern = r'.*\\' + f'{default_data.track_prefix}({default_data.track_regex})'
     ending_pattern = r'.*\.(WAV|wav|Wav|mp3)'
@@ -57,6 +60,9 @@ class MyApp:
         self.track_prefix_str = tk.StringVar(value=default_data.track_prefix)
         self.track_regex_str = tk.StringVar(value=default_data.track_regex)
         self.id_prefix_str = tk.StringVar(value=default_data.id_prefix)
+        self.full_regex_str = tk.StringVar(value='')
+        self.full_regex_str.set(get_path_pattern())
+        default_data.full_regex = self.full_regex_str.get()
         # 创建界面元素
         self.create_widgets()
 
@@ -91,23 +97,31 @@ class MyApp:
 
     def update_cd_prefix(self, *args):
         default_data.cd_prefix = self.cd_prefix_str.get()
-        print(get_path_pattern())
+        self.full_regex_str.set(get_path_pattern())
+        self.update_regex()
 
     def update_cd_regex(self, *args):
         default_data.cd_regex = self.cd_regex_str.get()
-        print(get_path_pattern())
+        self.full_regex_str.set(get_path_pattern())
+        self.update_regex()
 
     def update_track_prefix(self, *args):
         default_data.track_prefix = self.track_prefix_str.get()
-        print(get_path_pattern())
+        self.full_regex_str.set(get_path_pattern())
+        self.update_regex()
 
     def update_track_regex(self, *args):
         default_data.track_regex = self.track_regex_str.get()
-        print(get_path_pattern())
+        self.full_regex_str.set(get_path_pattern())
+        self.update_regex()
 
     def update_id_prefix(self, *args):
         default_data.id_prefix = self.id_prefix_str.get()
         print(f'{default_data.id_prefix}01-01')
+
+    def update_regex(self, *args):
+        default_data.full_regex = self.full_regex_str.get()
+        print(default_data.full_regex)
 
     def create_widgets(self):
         # 标签和输入框
@@ -167,9 +181,13 @@ class MyApp:
         self.album_str.trace_add("write", self.update_album)
         tk.Entry(self.root, textvariable=self.album_str).grid(row=12, column=1, columnspan=2, sticky="w")
 
+        tk.Label(self.root, text="Full Regex").grid(row=13, column=0, sticky="w")
+        self.full_regex_str.trace_add("write", self.update_regex)
+        tk.Entry(self.root, textvariable=self.full_regex_str).grid(row=13, column=1, columnspan=2, sticky="w")
+
         # 创建一个居中的按钮
         overwrite_button = tk.Button(self.root, text="OverWrite Original", command=self.overwrite_filelist)
-        overwrite_button.grid(row=13, sticky="nsew", columnspan=4)
+        overwrite_button.grid(row=14, sticky="nsew", columnspan=4)
 
     def browse_tab_file(self):
         file_path = filedialog.askopenfilename(filetypes=[("Tab Files", "*.tab")])
