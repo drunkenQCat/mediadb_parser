@@ -4,3 +4,4 @@ __pycache__/*
 *.json
 *.txt
 *.tab
+tab_to_file.py
