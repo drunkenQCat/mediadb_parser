@@ -18,10 +18,10 @@ def extract_serial_number(file_path):
     matched_condition = MatchCondition.NO_MATCH
 
     if not match:
-        matched_condition = MatchCondition.NO_MATCH
-    if len(match.groups()) == 1:
-        matched_condition = MatchCondition.TRACK_NUMBER_ONLY
+        return
     if len(match.groups()) == 2:
+        matched_condition = MatchCondition.TRACK_NUMBER_ONLY
+    if len(match.groups()) == 3:
         matched_condition = MatchCondition.CD_AND_TRACK_NUMBER
 
     if matched_condition == MatchCondition.TRACK_NUMBER_ONLY:
@@ -30,6 +30,9 @@ def extract_serial_number(file_path):
     if matched_condition == MatchCondition.CD_AND_TRACK_NUMBER:
         cd_number = match.group(1)
         track_number = match.group(2)
+        # 为PE临时添加
+        # cd_num = int(cd_number) + 40
+        # cd_number = str(cd_num)
         file_id = f'{default_data.id_prefix}{cd_number.zfill(2)}-{track_number.zfill(2)}'
     return file_id
     # data = {'file_path': file_path}
@@ -41,6 +44,18 @@ def update_reaper_filelist(reaper_data: dict, tab_data: dict):
     # 找到所有属于相应Soundlib的FILE
     filtered_elements = {key: value for key, value in reaper_data.items() if
                          value['sound_lib'] == default_data.lib_keyword}
+    # 检验lib中是否有音频文件。如果没有，找所有含lib_key的.wav文件
+    if not any(key.endswith('.wav') for key in filtered_elements):
+        # 遍历字典 B，找到符合条件的键，并添加到字典 A
+        for key, value in reaper_data.items():
+            if key.endswith('.wav') and default_data.lib_keyword in key:
+                filtered_elements[key] = value
+            elif key.endswith('.WAV') and default_data.lib_keyword in key:
+                filtered_elements[key] = value
+            elif key.endswith('.mp3') and default_data.lib_keyword in key:
+                filtered_elements[key] = value
+            elif key.endswith('.MP3') and default_data.lib_keyword in key:
+                filtered_elements[key] = value
 
     count = 0
     modified_file_id_list = []
@@ -80,6 +95,8 @@ def update_reaper_filelist(reaper_data: dict, tab_data: dict):
     with open('missing_file_log.txt', 'w', encoding='utf-8') as f:
         missing_count = 0
         first_modified_id = modified_file_id_list[0]
+        f.write("\n=========================\n")
+        f.write(default_data.lib_keyword + "\n")
         for file_id, _ in tab_data.items():
             if file_id not in modified_file_id_list and file_id >= first_modified_id:
                 if missing_count < 4:

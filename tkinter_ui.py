@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+import os
+import re
+import glob
 import tkinter as tk
 from tkinter import filedialog
 from tkinter import messagebox
@@ -66,6 +69,39 @@ class MyApp:
         # 创建界面元素
         self.create_widgets()
 
+
+    def update_all_paths_with_lib_key(self):
+        tab_file_folder = r"C:\Users\Administrator\Documents\Injector\TABS"
+        mediadb_folder = r"C:\REAPER\MediaDB"
+        key = default_data.lib_keyword
+        mediadb_path = os.path.join(mediadb_folder, key + ".ReaperFileList")
+
+        # 优化关键词处理，以支持更灵活的关键词匹配
+        abbr = key.split("-")[0]
+        words_in_key = key.split("-")[1].replace('.', ' ').split()
+        reg_to_find_tab = ".*" + ".*".join(words_in_key) + ".*\\.tab$"
+
+        # 使用 glob 搜索匹配的 TAB 文件
+        tab_files = glob.glob(os.path.join(tab_file_folder, '**', '*.tab'), recursive=True)
+        matched_tab_path = next((f for f in tab_files if re.match(reg_to_find_tab, os.path.basename(f), re.IGNORECASE)),
+                                None)
+
+        if matched_tab_path:
+            self.tab_file_path_str.set(matched_tab_path)
+            self.tab_data = read_tab_file(matched_tab_path)
+        else:
+            print("No matching TAB file found.")
+
+        # 设置和验证 MediaDB 路径
+        self.filelist_path_str.set(mediadb_path)
+        if not os.path.exists(mediadb_path):
+            print(f"MediaDB path {mediadb_path} does not exist.")
+        else:
+            self.paths, self.list_data = read_reaper_filelist(self.filelist_path_str.get())
+            display_head_and_tail(matched_tab_path)
+            display_head_and_tail(mediadb_path)
+            self.id_prefix_str.set(abbr)
+
     def update_lib_keyword(self, *args):
         # 这个函数会在 StringVar 的值变化时调用
         default_data.lib_keyword = self.lib_keyword_str.get()
@@ -130,6 +166,9 @@ class MyApp:
         self.lib_keyword_str.trace_add("write", self.update_lib_keyword)
         keyword_field = tk.Entry(self.root, textvariable=self.lib_keyword_str)
         keyword_field.grid(row=0, column=1, columnspan=2, sticky="w")
+        # 新增按钮，用于触发路径更新
+        update_paths_button = tk.Button(self.root, text="Update Paths", command=self.update_all_paths_with_lib_key)
+        update_paths_button.grid(row=0, column=3)
 
         tk.Label(self.root, text="Tab File Path:").grid(row=1, column=0, sticky="w")
         self.tab_file_path_str.trace_add("write", self.update_tab_path)
