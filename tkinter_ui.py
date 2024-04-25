@@ -229,7 +229,7 @@ class MyApp:
         overwrite_button.grid(row=14, sticky="nsew", columnspan=4)
 
     def browse_tab_file(self):
-        file_path = filedialog.askopenfilename(filetypes=[("Tab Files", "*.tab")])
+        file_path = filedialog.askopenfilename(filetypes=[("Tab Files", "*.tab"), ("Csv Files", "*.csv")])
         if file_path:
             self.tab_file_path_str.set(file_path)
             self.tab_data = read_tab_file(self.tab_file_path_str.get())

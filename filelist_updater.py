@@ -12,32 +12,9 @@ class MatchCondition(Enum):
 
 
 def extract_serial_number(file_path):
-    pattern = default_data.full_regex
-    match = re.match(pattern, file_path)
-    file_id = ''
-    matched_condition = MatchCondition.NO_MATCH
-
-    if not match:
-        return
-    if len(match.groups()) == 2:
-        matched_condition = MatchCondition.TRACK_NUMBER_ONLY
-    if len(match.groups()) == 3:
-        matched_condition = MatchCondition.CD_AND_TRACK_NUMBER
-
-    if matched_condition == MatchCondition.TRACK_NUMBER_ONLY:
-        track_number = match.group(1)
-        file_id = f'{default_data.id_prefix}-{track_number.zfill(2)}'
-    if matched_condition == MatchCondition.CD_AND_TRACK_NUMBER:
-        cd_number = match.group(1)
-        track_number = match.group(2)
-        # 为PE临时添加
-        # cd_num = int(cd_number) + 40
-        # cd_number = str(cd_num)
-        file_id = f'{default_data.id_prefix}{cd_number.zfill(2)}-{track_number.zfill(2)}'
+    path_parts = file_path.split("\\")
+    file_id = path_parts[-1].replace(".wav", "").strip()
     return file_id
-    # data = {'file_path': file_path}
-    # exec(default_data.extract_pattern, globals(), data)
-    # return data.get('id', '')
 
 
 def update_reaper_filelist(reaper_data: dict, tab_data: dict):

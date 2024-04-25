@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
-lib_keyword = "Premiere.Edition.3.SFX"
-album = "Premiere.Edition.3.SFX"
-tab_path = r"C:/Users/Administrator/Documents/Injector/TABS/Hollywood Edge Premier Edition (ALL).tab"
-reaper_filelist = r"C:/Users/Administrator/AppData/Roaming/REAPER/MediaDB/PE-Premiere Edition.ReaperFileList"
+lib_keyword = "DST-Destructibles"
+album = "DST-Destructibles"
+tab_path = r"C:\_SataVolumeA\Downloads\Export_TrackList_Destructibles Sound Effects.csv"
+reaper_filelist = r"C:\REAPER\MediaDB\DST-Destructibles.ReaperFileList"
 output_path = r"C:/TechnicalProjects/About_Python/mediadb_parser/output.ReaperFileList"
 extract_pattern = r"""
 pattern = r'.*\\cd(\d+)\\Track\s*(\d+).*\.(WAV|wav|Wav)'
