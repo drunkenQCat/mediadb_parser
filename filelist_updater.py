@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-import re
 from enum import Enum
 
 import default_data
@@ -45,7 +44,7 @@ def update_reaper_filelist(reaper_data: dict, tab_data: dict):
 
     for path, data in filtered_elements.items():
         file_id = extract_serial_number(path)
-        if file_id in tab_data:
+        if file_id in tab_data or file_id + ".wav" in tab_data:
             data['metadata']['C'] = default_data.album
             data['metadata']['T'] = tab_data[file_id]['title']
             data['metadata']['D'] = tab_data[file_id]['desc']
