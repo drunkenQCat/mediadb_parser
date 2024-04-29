@@ -14,8 +14,9 @@ def extract_serial_number(file_path):
     path_parts = file_path.split("\\")
     file_id = path_parts[-1].replace(".wav", "").strip()
     if "-" in file_id:
-        file_id = file_id.split("-")[0].strip()
+        file_id = "".join(file_id.split("-")[:-1]).strip()
         file_id = file_id.replace("_", "").replace(" ", "")
+        file_id = file_id.replace("&", "")
     return file_id
 
 
