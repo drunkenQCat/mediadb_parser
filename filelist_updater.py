@@ -13,6 +13,9 @@ class MatchCondition(Enum):
 def extract_serial_number(file_path):
     path_parts = file_path.split("\\")
     file_id = path_parts[-1].replace(".wav", "").strip()
+    if "-" in file_id:
+        file_id = file_id.split("-")[0].strip()
+        file_id = file_id.replace("_", "").replace(" ", "")
     return file_id
 
 
@@ -43,8 +46,15 @@ def update_reaper_filelist(reaper_data: dict, tab_data: dict):
     updated_entries = []
 
     for path, data in filtered_elements.items():
+        is_path_in_tab = False
         file_id = extract_serial_number(path)
-        if file_id in tab_data or file_id + ".wav" in tab_data:
+        if file_id in tab_data:
+            is_path_in_tab = True
+        elif file_id + ".wav" in tab_data:
+            file_id = file_id + ".wav"
+            is_path_in_tab = True
+
+        if is_path_in_tab:
             data['metadata']['C'] = default_data.album
             data['metadata']['T'] = tab_data[file_id]['title']
             data['metadata']['D'] = tab_data[file_id]['desc']
