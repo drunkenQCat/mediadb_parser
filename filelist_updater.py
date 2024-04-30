@@ -12,11 +12,7 @@ class MatchCondition(Enum):
 
 def extract_serial_number(file_path):
     path_parts = file_path.split("\\")
-    file_id = path_parts[-1].replace(".wav", "").strip()
-    if "-" in file_id:
-        file_id = "".join(file_id.split("-")[:-1]).strip()
-        file_id = file_id.replace("_", "").replace(" ", "")
-        file_id = file_id.replace("&", "")
+    file_id = path_parts[-1]
     return file_id
 
 
@@ -51,14 +47,12 @@ def update_reaper_filelist(reaper_data: dict, tab_data: dict):
         file_id = extract_serial_number(path)
         if file_id in tab_data:
             is_path_in_tab = True
-        elif file_id + ".wav" in tab_data:
-            file_id = file_id + ".wav"
-            is_path_in_tab = True
 
         if is_path_in_tab:
-            data['metadata']['C'] = default_data.album
+            data['metadata']['C'] = tab_data[file_id]['album']
             data['metadata']['T'] = tab_data[file_id]['title']
             data['metadata']['D'] = tab_data[file_id]['desc']
+            data['metadata']['B'] = default_data.album
             count += 1
             # 添加更新条目信息
             entry_info = f"Updated File ID: {file_id}, Title: {tab_data[file_id]['title']}, Desc: {tab_data[file_id]['desc']}"
