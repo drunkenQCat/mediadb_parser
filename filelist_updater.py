@@ -12,7 +12,7 @@ class MatchCondition(Enum):
 
 def extract_serial_number(file_path):
     path_parts = file_path.split("\\")
-    file_id = path_parts[-1].replace(".wav", "").strip()
+    file_id = path_parts[-1].split(".")[0].strip()
     if "-" in file_id:
         file_id = "".join(file_id.split("-")[:-1]).strip()
         file_id = file_id.replace("_", "").replace(" ", "")
@@ -22,8 +22,9 @@ def extract_serial_number(file_path):
 
 def update_reaper_filelist(reaper_data: dict, tab_data: dict):
     # 找到所有属于相应Soundlib的FILE
-    filtered_elements = {key: value for key, value in reaper_data.items() if
-                         value['sound_lib'] == default_data.lib_keyword}
+    # filtered_elements = {key: value for key, value in reaper_data.items() if
+    #                      value['sound_lib'] == default_data.lib_keyword}
+    filtered_elements = reaper_data
     # 检验lib中是否有音频文件。如果没有，找所有含lib_key的.wav文件
     if not any(key.endswith('.wav') for key in filtered_elements):
         # 遍历字典 B，找到符合条件的键，并添加到字典 A
@@ -35,6 +36,8 @@ def update_reaper_filelist(reaper_data: dict, tab_data: dict):
             elif key.endswith('.mp3') and default_data.lib_keyword in key:
                 filtered_elements[key] = value
             elif key.endswith('.MP3') and default_data.lib_keyword in key:
+                filtered_elements[key] = value
+            elif key.endswith('.ogg') and default_data.lib_keyword in key:
                 filtered_elements[key] = value
 
     count = 0
