@@ -43,7 +43,10 @@ def fix_all_irregular_items(reaper_files):
             try:
                 original_desc = inner_dict['metadata']['D']
             except KeyError:
-                inner_dict['metadata']['D'] = ''
+                try:
+                    inner_dict['metadata']['D'] = inner_dict['d']
+                except KeyError:
+                    inner_dict['metadata']['D'] = ''
             # 替换不规则键名的格式，并将它们添加到原始描述后面
             irregular_keys = [key.replace('"', " ").replace(':', " ") for key in uppercase_keys]
             new_desc = original_desc + ' '+' '.join(irregular_keys)

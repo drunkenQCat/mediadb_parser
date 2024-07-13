@@ -69,7 +69,8 @@ def update_reaper_filelist(reaper_data: dict, tab_data: dict):
     for path, data in filtered_elements.items():
         file_id = extract_serial_number(path)
         if file_id in tab_data:
-            data['metadata']['C'] = default_data.album
+            data['metadata']['A'] = default_data.album
+            data['metadata']['C'] = tab_data[file_id]['desc']
             data['metadata']['T'] = tab_data[file_id]['title']
             data['metadata']['D'] = tab_data[file_id]['desc']
             count += 1

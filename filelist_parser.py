@@ -145,7 +145,10 @@ def convert_to_lib_path_structure(reaper_data):
 
 def parse_soundlib(wav_path: str):
     splited = wav_path.split('\\')
+    if len(splited) < 3:
+        return "default"
     return splited[-3]
+
 
 def list_all_tabs(path = r'C:\Users\Administrator\Documents\Injector\TABS'):
     p = Path(path)
